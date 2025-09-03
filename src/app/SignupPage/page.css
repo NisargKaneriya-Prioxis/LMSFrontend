@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .loginContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: transparent;
+  }
+  
+  .loginForm {
+    background-color: gray;
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .loginTitle {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: blue;
+  }
+  
+  .loginForm input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .loginForm button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background-color: blue;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .loginForm button:hover {
+    background-color: lightskyblue;
+  }
+  
+  .signupText {
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .signupText a {
+    color: blue;
+    text-decoration: none;
+  }
+  
+  .signupText a:hover {
+    text-decoration: underline;
+  }
+  
+  .roleContainer {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.roleContainer label {
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+}
+
+.roleContainer input[type="radio"] {
+  margin-right: 5px;
+  accent-color: blue;
+}
