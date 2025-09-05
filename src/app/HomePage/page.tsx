@@ -1,7 +1,16 @@
+"use client";
+import BookList from "@/Components/Booklist";
+import Footer from "@/Components/Footer";
+import HeaderSection from "@/Components/HeaderSection";
+import HeroSection from "@/Components/HeroSection";
+import React from "react";
 export default function HomePage(){
     return (
-        <h1>
-           welcome to home page 
-        </h1>
+       <>
+       <HeaderSection/>
+       <HeroSection/>
+       <BookList/>
+       <Footer/>
+       </>
     )
 }

@@ -1,0 +1,38 @@
+.borrowed-book-container {
+    padding: 20px;
+    color: #e5e5e5;
+}
+
+.borrowed-book-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.borrowed-book-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.borrowed-book-table th,
+.borrowed-book-table td {
+    padding: 12px 15px;
+    border: 1px solid #2c2c2c;
+    text-align: left;
+}
+
+.borrowed-book-table th {
+    background-color: #1f1f1f;
+    color: #ffffff;
+}
+
+.borrowed-book-table tr:nth-child(even) {
+    background-color: #1a1a1a;
+}
+
+.borrowed-book-table tr:hover {
+    background-color: #272727;
+}
+
+.text-center {
+    text-align: center;
+}
