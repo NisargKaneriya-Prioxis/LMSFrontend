@@ -12,6 +12,7 @@ interface Book {
     language: string,
     bookPages: string,
     quantity: number,
+    categoryName:string,
     availableQuantity: number,
     publishYear: number,
     publisher: string,
@@ -32,7 +33,7 @@ function handledelete(sid: string) {
                 throw new Error("Network response was not ok");
             }
             alert("Book deleted successfully!");
-            window.location.href = "/";
+            window.location.href = "/HomePage";
         })
         .catch((error) => {
             console.error("Error deleting book:", error);
@@ -44,13 +45,19 @@ export default function BookDetail() {
     const { bookSid } = useParams();
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
+    const [role, setRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        const storedRole = localStorage.getItem("userRole");
+        setRole(storedRole);
+      }, []);
+    
 
     useEffect(() => {
         const fetchBooks = async () => {
             try {
                 const response = await fetch(`http://localhost:5171/dynamic/${bookSid}`);
                 const data = await response.json();
-
                 if (data) {
                     setBooks([data]);
                 } else {
@@ -89,12 +96,14 @@ export default function BookDetail() {
                 <p>Language : {books[0].language}</p>
                 <p>BookPages : {books[0].bookPages}</p>
                 <p>Quantity : {books[0].quantity}</p>
+                <p>CategoryName : {books[0].categoryName}</p>
                 <p>AvailableQuantity : {books[0].availableQuantity}</p>
                 <p>PublishYear : {books[0].publishYear}</p>
                 <p>Publisher : {books[0].publisher}</p>
-                <div className="actions">
+                {role !== "Student" && (
+                    <div className="actions">
                     <a
-                        href={`/UpdateBook/${books[0].bookSid}`}
+                        href={`/Book/UpdateBook/${books[0].bookSid}`}
                     >
                         Update Book
                     </a>
@@ -105,7 +114,8 @@ export default function BookDetail() {
                         Delete Book
                     </a>
                 </div>
-
+                )}
+                
             </div>
         </div>
     )

@@ -13,6 +13,7 @@ export default function LoginPage() {
       const response = await fetch("http://localhost:5171/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -23,23 +24,23 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+
       if (data.role?.toLowerCase() === "student") {
         alert("Welcome Student!");
-        window.location.href ="/HomePage";
+        window.location.href = "/HomePage";
       } else if (data.role?.toLowerCase() === "admin") {
         alert("Welcome Admin!");
-        window.location.href ="/HomePage";
+        window.location.href = "/HomePage";
       } else {
         alert("Welcome " + data.name);
-        window.location.href ="/HomePage";
+        window.location.href = "/HomePage";
       }
-
     } catch (error) {
       console.error("Login error:", error);
       alert("Something went wrong. Please try again.");
-    }
-  };
+    } 
+   };
 
   return (
     <div className="loginContainer">

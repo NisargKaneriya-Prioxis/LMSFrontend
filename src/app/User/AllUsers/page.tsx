@@ -80,6 +80,44 @@ export default function AllUsers(){
         <div className="users-page">
             <h2>All Users</h2>
             <p>Manage all users</p>
+            <div className="search-filter-container">
+                <input
+                    type="text"
+                    placeholder="Search by name or Email"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                />
+
+                <button
+                    onClick={() => {
+                        setCurrentPage(1);
+                        fetchUsers();
+                    }}
+                    className="search-btn"
+                >
+                    Search
+                </button>
+
+                <select
+                    value={sortColumn}
+                    onChange={(e) => setSortColumn(e.target.value)}
+                    className="filter-select"
+                >
+                    <option value="email">Student Email</option>
+                    <option value="name">Student Name</option>
+                    <option value="phonenumber">Phonenumber</option>
+                </select>
+
+                <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="filter-select"
+                >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
             <table className="users-table">
                 <thead>
                     <tr>

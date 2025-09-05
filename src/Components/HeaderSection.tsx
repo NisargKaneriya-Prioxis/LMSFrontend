@@ -1,15 +1,27 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./stylesheet/Header.css";
 import Link from "next/link";
 
 export default function HeaderSection() {
-      const [userRole, setUserRole] = useState<string>("Admin"); 
-   const handleLogout = () => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            window.location.href = "/LoginPage"; 
-          };
+  const [role, setRole] = useState<string | null>(null);
+  useEffect(() => {
+    const storedRole = localStorage.getItem("userRole");
+    setRole(storedRole);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5171/logout", {
+        method: "POST",
+      });
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    }
+    alert("Logged out successfully");
+    window.location.href = "/LoginPage";
+  };
+
   return (
     <header className="header">
       <div className="logo">LibraryManagement</div>
@@ -17,10 +29,9 @@ export default function HeaderSection() {
         <a className="active" href="#home">Home</a>
         <a href="#contact">Contact</a>
         <a href="#about">About</a>
-        {userRole !== "Student" && (
+        {role !== "Student" && (
                 <>
                <Link href={"/User/AllUsers"}>All User</Link>
-               <a href="#about">Add User</a>
                 </>
             )}
        <Link href={"/Book/BorrowedBook"}>Borrowed Book</Link>

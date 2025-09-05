@@ -9,6 +9,7 @@ interface Book {
   isbn: string,
   edition: string,
   language: string,
+  categoryName:string,
   bookPages: string,
   quantity: number,
   availableQuantity: number,
@@ -77,6 +78,49 @@ export default function AllBooks() {
         <h2>All Books</h2>
         <p>Read the best book</p>
       </div>
+      <div className="search-filter-container">
+        <input
+          type="text"
+          placeholder="Search by title, author, ISBN"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="search-input"
+        />
+
+        <button
+          onClick={() => {
+            setCurrentPage(1);
+            fetchBooks();
+          }}
+          className="search-btn"
+        >
+          Search
+        </button>
+
+        <select
+          value={sortColumn}
+          onChange={(e) => setSortColumn(e.target.value)}
+          className="filter-select"
+        >
+          <option value="title">Title</option>
+          <option value="author">Author</option>
+          <option value="isbn">ISBN</option>
+          <option value="publishedYear">Published Year</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="filter-select"
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+      {books.length === 0 && !loading ? (
+    <p className="text-center text-white text-lg">No books found.</p>
+  ) 
+     :(
       <div className="cards-container">
         {books.map((item) => (
           <div key={item.bookSid} className="card">
@@ -85,13 +129,14 @@ export default function AllBooks() {
             <a
 
               href={`BookDetail/${item.bookSid}`}
-              className="mx-2 px-2 py-2 rounded-lg border border-neutral-600 text-neutral-700 bg-white hover:bg-green-300 transition duration-200"
             >
               Detail Book
             </a>
           </div>
         ))}
       </div>
+     )}
+      
     </div>
   )
 }

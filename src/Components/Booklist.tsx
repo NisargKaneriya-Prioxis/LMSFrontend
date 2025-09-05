@@ -20,7 +20,13 @@ interface Book {
 export default function BookList() {
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
-    const [userRole, setUserRole] = useState<string>("Admin");
+    const [role, setRole] = useState<string | null>(null);
+
+    useEffect(() => {
+      const storedRole = localStorage.getItem("userRole");
+      setRole(storedRole);
+    }, []);
+  
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -69,8 +75,8 @@ export default function BookList() {
                 <Link href={"/Book/AllBooks"} className="btn primary">
                     View All Books
                 </Link>
-                {userRole !== "Student" && (
-                    <Link href={"/AddNewBook"} className="btn secondary">
+                {role !== "Student" && (
+                    <Link href={"/Book/AddBook"} className="btn secondary">
                         + Add New Book
                     </Link>
                 )}

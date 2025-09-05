@@ -10,7 +10,7 @@ export default function SignupPage() {
         password: "",
         phoneNumber: "",
         address: "",
-        role: "User"
+        role: "Student"
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

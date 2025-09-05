@@ -22,6 +22,7 @@ interface ApiResponse {
     };
     result: BorrowedBook[];
   }
+
 export default function BorrowedBook(){
       const [borrowedbooks, setBorrowedBooks] = useState<BorrowedBook[]>([]);
       const [loading, setLoading] = useState(true);
@@ -31,6 +32,13 @@ export default function BorrowedBook(){
       const [search, setSearch] = useState("");
       const [sortColumn, setSortColumn] = useState("title");
       const [sortOrder, setSortOrder] = useState("asc");
+      const [role, setRole] = useState<string | null>(null);
+
+      useEffect(() => {
+        const storedRole = localStorage.getItem("userRole");
+        setRole(storedRole);
+      }, []);
+
 
        const fetchBorrowedBooks = async () => {
           setLoading(true);
@@ -43,10 +51,11 @@ export default function BorrowedBook(){
               SortOrder: sortOrder,
       
             });
-      
-            const res = await fetch(
-              `http://localhost:5171/getallborrowedbook?${params}`
-            );
+            const api =
+            role === "Admin"
+              ? `http://localhost:5171/getallborrowedbook?${params}` 
+              : `http://localhost:5171/getallborrowedbookStudent?${params}`; 
+            const res = await fetch(api);
       
             const data: ApiResponse = await res.json();
             setBorrowedBooks(data.result || []);
@@ -68,16 +77,42 @@ export default function BorrowedBook(){
         return (
             <div className="borrowed-book-container">
             <h2>Borrowed Books</h2>
+            <div className="search-filter-container">
+                <input type="text" placeholder="Search by name or title" value={search} onChange={(e) => setSearch(e.target.value)} className="search-input"/>
+
+                <button onClick={() => {
+                        setCurrentPage(1);
+                        fetchBorrowedBooks();
+                    }}
+                    className="search-btn"
+                >
+                    Search
+                </button>
+
+                <select value={sortColumn} onChange={(e) => setSortColumn(e.target.value)} className="filter-select">
+                    <option value="title">Book Title</option>
+                    <option value="name">Student Name</option>
+                    <option value="issueDate">Issue Date</option>
+                    <option value="dueDate">Due Date</option>
+                </select>
+
+                <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="filter-select">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
             <table className="borrowed-book-table">
                 <thead>
                     <tr>
-                        <th>Borrowed SID</th>
                         <th>Student Name</th>
                         <th>Book Title</th>
                         <th>Issue Date</th>
                         <th>Due Date</th>
                         <th>Return Date</th>
                         <th>Status</th>
+                    {role === "Admin" && (
+                        <th>Actions</th>
+                    )}
                     </tr>
                 </thead>
                 <tbody>
@@ -88,13 +123,20 @@ export default function BorrowedBook(){
                     ) : (
                         borrowedbooks.map((item) => (
                             <tr key={item.borrowedSID}>
-                                <td>{item.borrowedSID}</td>
                                 <td>{item.name}</td>
                                 <td>{item.title}</td>
                                 <td>{item.issueDate}</td>
                                 <td>{item.dueDate}</td>
                                 <td>{item.returnDate || "-"}</td>
                                 <td>{item.borrowedBookStatus === 9 ? "Borrowed" : "Returned"}</td>
+                                {role === "Admin" && (
+                                <td className="action-buttons">
+                                {item.borrowedBookStatus === 9 ?  <button className="btn return">
+                                    Return
+                                </button> : "already Returned"}
+                                </td>
+                                )}
+                               
                             </tr>
                         ))
                     )}
