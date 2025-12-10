@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import "./page.css"
-
+import { useRouter } from "next/navigation";
 interface User{
     userSid: string,
     name: string,
@@ -30,9 +30,16 @@ export default function AllUsers(){
     const [search, setSearch] = useState("");
     const [sortColumn, setSortColumn] = useState("name");
     const [sortOrder, setSortOrder] = useState("asc");
+    const router = useRouter();
 
     const fetchUsers = async () => {
         setLoading(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+            router.push("/LoginPage"); 
+            return;
+        }
+
         try {
             const params = new URLSearchParams({
                 Page: currentPage.toString(),
@@ -42,7 +49,17 @@ export default function AllUsers(){
                 SortOrder: sortOrder,
             });
 
-            const res = await fetch(`http://localhost:5171/getalluser?${params}`);
+            const res = await fetch(`http://localhost:5171/getalluser?${params}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (res.status === 401) {
+                router.push("/LoginPage");
+                return;
+            }
+
             const data: ApiResponse = await res.json();
             setUsers(data.result || []);
             setTotalPages(data.meta?.total_page_num || 1);

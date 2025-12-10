@@ -1,0 +1,49 @@
+.about-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #111827; 
+}
+  .about-card {
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem; 
+    padding: 2rem;
+    max-width: 32rem; 
+    width: 100%;
+    text-align: center;
+  }
+  
+  .about-title {
+    font-size: 2.25rem; 
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .about-text {
+    font-size: 1.125rem; 
+    color: #374151;
+    margin-bottom: 2rem;
+  }
+  
+  .about-subtext {
+    font-size: 0.875rem; 
+    color: #6b7280; 
+  }
+  @media (prefers-color-scheme: dark) {
+    .about-card {
+      background-color: #18181b;
+    }
+  
+    .about-text {
+      color: #d4d4d8; 
+    }
+  
+    .about-subtext {
+      color: #a1a1aa; 
+    }
+  }
+  

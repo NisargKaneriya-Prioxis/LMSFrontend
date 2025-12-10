@@ -1,6 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation";
 import "./page.css";   
+import LoginPage from "../LoginPage/page";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -11,22 +12,6 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="landing-container">
-      <h1 className="landing-title">Welcome to Library System</h1>
-      <div className="button-group">
-        <button
-          onClick={() => handleSelectRole("Student")}
-          className="role-button student-btn"
-        >
-          Student
-        </button>
-        <button
-          onClick={() => handleSelectRole("Admin")}
-          className="role-button admin-btn"
-        >
-          Admin
-        </button>
-      </div>
-    </div>
+    <LoginPage/>
   );
 }

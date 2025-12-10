@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import "./page.css"
+import { useRouter } from "next/navigation";
 
 interface BorrowedBook{
     borrowedSID:string,
@@ -21,7 +22,7 @@ interface ApiResponse {
       next_page_exists: boolean;
     };
     result: BorrowedBook[];
-  }
+  }                                
 
 export default function BorrowedBook(){
       const [borrowedbooks, setBorrowedBooks] = useState<BorrowedBook[]>([]);
@@ -33,15 +34,30 @@ export default function BorrowedBook(){
       const [sortColumn, setSortColumn] = useState("title");
       const [sortOrder, setSortOrder] = useState("asc");
       const [role, setRole] = useState<string | null>(null);
+      const router = useRouter();
 
-      useEffect(() => {
-        const storedRole = localStorage.getItem("userRole");
-        setRole(storedRole);
-      }, []);
+  useEffect(() => {
+    const storedRole = localStorage.getItem("userRole");
+    setRole(storedRole);
+  }, []);
 
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) {
+      router.push("/LoginPage"); 
+      return;
+    }
+    const user = JSON.parse(userStr);
+    setRole(user.role);
+  }, [router]);
 
        const fetchBorrowedBooks = async () => {
           setLoading(true);
+          const token = localStorage.getItem("token");
+          if (!token) {
+            router.push("/LoginPage");
+            return;
+          }
           try {
             const params = new URLSearchParams({
               Page: currentPage.toString(),
@@ -51,11 +67,11 @@ export default function BorrowedBook(){
               SortOrder: sortOrder,
       
             });
-            const api =
-            role === "Admin"
-              ? `http://localhost:5171/getallborrowedbook?${params}` 
-              : `http://localhost:5171/getallborrowedbookStudent?${params}`; 
-            const res = await fetch(api);
+            const res = await fetch(`http://localhost:5171/getallborrowedbook?${params}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
       
             const data: ApiResponse = await res.json();
             setBorrowedBooks(data.result || []);
@@ -70,7 +86,7 @@ export default function BorrowedBook(){
       
         useEffect(() => {
             fetchBorrowedBooks();
-        }, [currentPage, sortColumn, sortOrder]);
+        }, [router,currentPage, sortColumn, sortOrder]);
       
         if (loading) return <p className="text-center mt-10">Loading books...</p>;
     
@@ -78,20 +94,21 @@ export default function BorrowedBook(){
             <div className="borrowed-book-container">
             <h2>Borrowed Books</h2>
             <div className="search-filter-container">
-                <input type="text" placeholder="Search by name or title" value={search} onChange={(e) => setSearch(e.target.value)} className="search-input"/>
+                <input type="text" placeholder="Search by title" value={search} onChange={(e) => setSearch(e.target.value)} className="search-input"/>
 
                 <button onClick={() => {
                         setCurrentPage(1);
                         fetchBorrowedBooks();
                     }}
-                    className="search-btn"
-                >
+                    className="search-btn">
                     Search
                 </button>
 
                 <select value={sortColumn} onChange={(e) => setSortColumn(e.target.value)} className="filter-select">
                     <option value="title">Book Title</option>
-                    <option value="name">Student Name</option>
+                    {role && role !== "Student" && ( 
+                        <option value="name">Student Name</option>
+                     )}
                     <option value="issueDate">Issue Date</option>
                     <option value="dueDate">Due Date</option>
                 </select>
@@ -104,13 +121,17 @@ export default function BorrowedBook(){
             <table className="borrowed-book-table">
                 <thead>
                     <tr>
+                    {role && role !== "Student" && ( 
                         <th>Student Name</th>
+                     )}
                         <th>Book Title</th>
                         <th>Issue Date</th>
                         <th>Due Date</th>
-                        <th>Return Date</th>
+                        {role && role !== "Student" && ( 
+                         <th>Return Date</th>
+                     )}
                         <th>Status</th>
-                    {role === "Admin" && (
+                    {role && role !== "Student" && (
                         <th>Actions</th>
                     )}
                     </tr>
@@ -123,13 +144,17 @@ export default function BorrowedBook(){
                     ) : (
                         borrowedbooks.map((item) => (
                             <tr key={item.borrowedSID}>
-                                <td>{item.name}</td>
+                                {role && role !== "Student" && (
+                                   <td>{item.name}</td>
+                                )}
                                 <td>{item.title}</td>
                                 <td>{item.issueDate}</td>
                                 <td>{item.dueDate}</td>
-                                <td>{item.returnDate || "-"}</td>
+                                {role && role !== "Student" && (
+                                   <td>{item.returnDate || "-"}</td>
+                                )}
                                 <td>{item.borrowedBookStatus === 9 ? "Borrowed" : "Returned"}</td>
-                                {role === "Admin" && (
+                                {role && role !== "Student" && (
                                 <td className="action-buttons">
                                 {item.borrowedBookStatus === 9 ?  <button className="btn return">
                                     Return

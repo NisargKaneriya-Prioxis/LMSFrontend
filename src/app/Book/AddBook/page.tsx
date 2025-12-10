@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import "./page.css"
+import { useRouter } from "next/navigation";
 
 interface Book {
     bookSid: string,
@@ -15,7 +16,7 @@ interface Book {
     availableQuantity: number,
     publishYear: number,
     publisher: string,
-  }
+  }  
 
   interface Category {
     categorySid: string;
@@ -37,17 +38,33 @@ export default function AddBook(){
     const[loading, setLoading] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [categorySid, setCategorySid] = useState("");
+    const router = useRouter();
   
-
     useEffect(() => {
-        const fetchCategories = async () => {
+      const fetchCategories = async () => {
+          const token = localStorage.getItem("token");
+          if (!token) {
+              router.push("/LoginPage");
+              return;
+          }
+
           try {
-            const res = await fetch("http://localhost:5171/getallcategory");
-            const data = await res.json();
-            setCategories(data.result || []);
+              const res = await fetch("http://localhost:5171/getallcategory", {
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              });
+
+              if (res.status === 401) {
+                  router.push("/LoginPage");
+                  return;
+              }
+
+              const data = await res.json();
+              setCategories(data.result || []);
           } catch (err) {
-            console.error("Error fetching categories:", err);
-            setCategories([]);
+              console.error("Error fetching categories:", err);
+              setCategories([]);
           }
         };
         fetchCategories();
@@ -56,6 +73,13 @@ export default function AddBook(){
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        
+        const token = localStorage.getItem("token");
+        if (!token) {
+            router.push("/LoginPage");
+            return;
+        }
+
 
         const bookData = {
             title,
@@ -71,37 +95,45 @@ export default function AddBook(){
         }
 
         try {
-            const response = await fetch(`http://localhost:5171/InsertBook?CategorySID=${categorySid}`, {
+          const response = await fetch(`http://localhost:5171/InsertBook?CategorySID=${categorySid}`, {
               method: "POST",
               headers: {
-                "Content-Type": "application/json",
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify([bookData]),
-            });
-      
-            if (!response.ok) {
+          });
+
+          if (!response.ok) {
+              if (response.status === 401) {
+                  router.push("/LoginPage");
+                  return;
+              }
               throw new Error("Failed to add book");
-            }
-      
-            const result = await response.json();
-            console.log("Book added successfully:", result);
-            alert("Book added successfully!");
-          
-            setTitle("");
-            setAuthor("");
-            setIsbn("");
-            setBookpages("");
-            setEdition("");
-            setLanguage("");
-            setPublishYear("");
-            setQuantity("");
-            setAvailableQuantity("");
-            setPublisher("")
-          } catch (error) {
-            console.error("Error adding book:", error);
-          } finally {
-            setLoading(false);
           }
+
+          const result = await response.json();
+          console.log("Book added successfully:", result);
+          alert("Book added successfully!");
+
+          setTitle("");
+          setAuthor("");
+          setIsbn("");
+          setBookpages("");
+          setEdition("");
+          setLanguage("");
+          setPublishYear("");
+          setQuantity("");
+          setAvailableQuantity("");
+          setPublisher("");
+
+          router.push("/HomePage"); 
+      } catch (error) {
+          console.error("Error adding book:", error);
+          alert("Error adding book");
+      } finally {
+          setLoading(false);
+      }
     
           window.location.href = "/HomePage";
     }
@@ -153,3 +185,4 @@ export default function AddBook(){
       </div>
     );
 }
+

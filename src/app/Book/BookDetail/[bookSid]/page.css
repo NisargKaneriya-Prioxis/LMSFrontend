@@ -58,12 +58,40 @@ h2 {
   transition: all 0.3s ease;
 }
 
+.cards-container .actions-request {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;   
+  align-items: center;      
+}
+
+.request-btn{
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.request-btn:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  transform: scale(1.05);
+}
+
 .cards-container a[href*="UpdateBook"] {
   background: linear-gradient(135deg, #22c55e, #16a34a);
   color: white;
 }
 
 .cards-container a[href*="UpdateBook"]:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  transform: scale(1.05);
+}
+
+.cards-container a[href*="AddBorrowBook"] {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.cards-container a[href*="AddBorrowBook"]:hover {
   background: linear-gradient(135deg, #16a34a, #15803d);
   transform: scale(1.05);
 }

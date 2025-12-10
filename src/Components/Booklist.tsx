@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import "./stylesheet/Booklist.css"
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Book {
     bookSid: string,
@@ -21,17 +22,40 @@ export default function BookList() {
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [role, setRole] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
-      const storedRole = localStorage.getItem("userRole");
-      setRole(storedRole);
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            setRole(parsed.role);
+        }
     }, []);
-  
+
+    useEffect(() => {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) {
+          router.push("/LoginPage"); 
+          return;
+        }
+        const user = JSON.parse(userStr);
+        setRole(user.role);
+      }, [router]);
+
 
     useEffect(() => {
         const fetchBooks = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+              router.push("/LoginPage");
+              return;
+            }
             try {
-                const res = await fetch("http://localhost:5171/getallbook");
+                const res = await fetch("http://localhost:5171/getallbook", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 const data = await res.json();
 
                 console.log("Api response:", data);
@@ -49,7 +73,7 @@ export default function BookList() {
         };
 
         fetchBooks();
-    }, []);
+    }, [router]);
 
     if (loading) {
         return <p className="text-center mt-10">Loading books...</p>;
@@ -75,7 +99,7 @@ export default function BookList() {
                 <Link href={"/Book/AllBooks"} className="btn primary">
                     View All Books
                 </Link>
-                {role !== "Student" && (
+                {role && role !== "Student" && (
                     <Link href={"/Book/AddBook"} className="btn secondary">
                         + Add New Book
                     </Link>

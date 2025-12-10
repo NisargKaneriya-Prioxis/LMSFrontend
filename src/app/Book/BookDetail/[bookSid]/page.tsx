@@ -1,7 +1,10 @@
 "use client"
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import "./page.css"
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { jwtDecode } from "jwt-decode";
 
 interface Book {
     bookSid: string,
@@ -12,10 +15,33 @@ interface Book {
     language: string,
     bookPages: string,
     quantity: number,
-    categoryName:string,
+    categoryName: string,
     availableQuantity: number,
     publishYear: number,
     publisher: string,
+}
+
+interface DecodedToken {
+    userId: number;
+    role: string;
+    email: string;
+    exp: number; 
+    iat: number; 
+  }
+
+function requestforbook(sid: String){
+    const confirmDelete = window.confirm(
+        "Are you sure you want to request for book this book?"
+    );
+
+    if (!confirmDelete) return;
+
+    const token = localStorage.getItem("token");
+if (token) {
+  const decoded = jwtDecode<DecodedToken>(token);
+  console.log(decoded.userId);  
+  console.log(decoded.role);   
+}
 }
 
 function handledelete(sid: string) {
@@ -46,17 +72,29 @@ export default function BookDetail() {
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [role, setRole] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
-        const storedRole = localStorage.getItem("userRole");
-        setRole(storedRole);
-      }, []);
-    
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            setRole(parsed.role);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchBooks = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router.push("/LoginPage");
+                return;
+            }
             try {
-                const response = await fetch(`http://localhost:5171/dynamic/${bookSid}`);
+                const response = await fetch(`http://localhost:5171/dynamic/${bookSid}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 const data = await response.json();
                 if (data) {
                     setBooks([data]);
@@ -71,7 +109,7 @@ export default function BookDetail() {
         };
 
         fetchBooks();
-    }, [bookSid]);
+    }, [router, bookSid]);
     if (loading) {
         return <p className="text-center mt-10">Loading book details...</p>;
     }
@@ -100,22 +138,29 @@ export default function BookDetail() {
                 <p>AvailableQuantity : {books[0].availableQuantity}</p>
                 <p>PublishYear : {books[0].publishYear}</p>
                 <p>Publisher : {books[0].publisher}</p>
-                {role !== "Student" && (
+                {
+                    role && role !== "Admin" && (
+                        <div className="actions-request">
+                            <a onClick={() => requestforbook(books[0].bookSid)} className="delete-btn">
+                            Request Book
+                        </a>
+                        </div>
+                    )
+                }
+                {role && role !== "Student" && (
                     <div className="actions">
-                    <a
-                        href={`/Book/UpdateBook/${books[0].bookSid}`}
-                    >
-                        Update Book
-                    </a>
-                    <a
-                        onClick={() => handledelete(books[0].bookSid)}
-                        className="delete-btn"
-                    >
-                        Delete Book
-                    </a>
-                </div>
+                        <a
+                            href={`/Book/UpdateBook/${books[0].bookSid}`}
+                        >
+                            Update Book
+                        </a>
+                        <a onClick={() => handledelete(books[0].bookSid)} className="delete-btn">
+                            Delete Book
+                        </a>
+                        {books[0].availableQuantity == 0 ? "All Book Borrow " : <a href={`/Book/AddBorrowBook/${books[0].bookSid}`}>Borrow</a>}
+                    </div>
                 )}
-                
+
             </div>
         </div>
     )
